@@ -8,6 +8,8 @@
 
 #import "RNPanHandler.h"
 
+#if !TARGET_OS_OSX
+
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
 @interface RNBetterPanGestureRecognizer : UIPanGestureRecognizer
@@ -223,15 +225,21 @@
 
 @end
 
+#endif
+
 @implementation RNPanGestureHandler
 
 - (instancetype)initWithTag:(NSNumber *)tag
 {
   if ((self = [super initWithTag:tag])) {
+#if !TARGET_OS_OSX
     _recognizer = [[RNBetterPanGestureRecognizer alloc] initWithGestureHandler:self];
+#endif
   }
   return self;
 }
+
+#if !TARGET_OS_OSX
 
 - (void)resetConfig
 {
@@ -327,5 +335,7 @@
                                    withVelocity:[recognizer velocityInView:recognizer.view.window]
                             withNumberOfTouches:recognizer.numberOfTouches];
 }
+
+#endif
 
 @end

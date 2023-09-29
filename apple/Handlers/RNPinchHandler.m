@@ -10,7 +10,7 @@
 
 #import "RNPinchHandler.h"
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_OSX
 @interface RNBetterPinchRecognizer : UIPinchGestureRecognizer
 
 - (id)initWithGestureHandler:(RNGestureHandler *)gestureHandler;
@@ -75,14 +75,14 @@
 - (instancetype)initWithTag:(NSNumber *)tag
 {
   if ((self = [super initWithTag:tag])) {
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_OSX
     _recognizer = [[RNBetterPinchRecognizer alloc] initWithGestureHandler:self];
 #endif
   }
   return self;
 }
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_OSX
 - (RNGestureHandlerEventExtraData *)eventExtraData:(UIPinchGestureRecognizer *)recognizer
 {
   return [RNGestureHandlerEventExtraData forPinch:recognizer.scale

@@ -8,7 +8,9 @@
 
 #import "RNNativeViewHandler.h"
 
+#if !TARGET_OS_OSX
 #import <UIKit/UIGestureRecognizerSubclass.h>
+#endif
 
 #import <React/RCTConvert.h>
 #import <React/UIView+React.h>
@@ -28,10 +30,14 @@
 - (id)initWithGestureHandler:(RNGestureHandler *)gestureHandler
 {
   if ((self = [super initWithTarget:gestureHandler action:@selector(handleGesture:)])) {
+#if !TARGET_OS_OSX
     _gestureHandler = gestureHandler;
+#endif
   }
   return self;
 }
+
+#if !TARGET_OS_OSX
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
@@ -62,6 +68,7 @@
   [_gestureHandler.pointerTracker reset];
   [super reset];
 }
+#endif
 
 @end
 
@@ -75,11 +82,14 @@
 - (instancetype)initWithTag:(NSNumber *)tag
 {
   if ((self = [super initWithTag:tag])) {
+#if !TARGET_OS_OSX
     _recognizer = [[RNDummyGestureRecognizer alloc] initWithGestureHandler:self];
+#endif
   }
   return self;
 }
 
+#if !TARGET_OS_OSX
 - (void)configure:(NSDictionary *)config
 {
   [super configure:config];
@@ -189,5 +199,6 @@
            forViewWithTag:sender.reactTag
             withExtraData:[RNGestureHandlerEventExtraData forPointerInside:NO]];
 }
+#endif
 
 @end

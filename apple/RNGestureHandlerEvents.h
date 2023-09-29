@@ -1,9 +1,9 @@
 #import <React/RCTEventDispatcher.h>
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 
 #import "RNGHTouchEventType.h"
+#import "RNGHUiKit.h"
 #import "RNGestureHandlerState.h"
 
 @interface RNGestureHandlerEventExtraData : NSObject

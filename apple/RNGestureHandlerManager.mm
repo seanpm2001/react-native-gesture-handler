@@ -106,7 +106,7 @@ constexpr int NEW_ARCH_NUMBER_OF_ATTACH_RETRIES = 25;
                toViewWithTag:(nonnull NSNumber *)viewTag
               withActionType:(RNGestureHandlerActionType)actionType
 {
-  UIView *view = [_uiManager viewForReactTag:viewTag];
+  RNGHUIView *view = [_uiManager viewForReactTag:viewTag];
 
 #ifdef RCT_NEW_ARCH_ENABLED
   if (view == nil || view.superview == nil) {
@@ -198,11 +198,12 @@ constexpr int NEW_ARCH_NUMBER_OF_ATTACH_RETRIES = 25;
 
 #pragma mark Root Views Management
 
-- (void)registerViewWithGestureRecognizerAttachedIfNeeded:(UIView *)childView
+- (void)registerViewWithGestureRecognizerAttachedIfNeeded:(RNGHUIView *)childView
 {
 #ifdef RCT_NEW_ARCH_ENABLED
-  UIView *touchHandlerView = childView;
+  RNGHUIView *touchHandlerView = childView;
 
+#if !TARGET_OS_OSX
   if ([[childView reactViewController] isKindOfClass:[RCTFabricModalHostViewController class]]) {
     touchHandlerView = [childView reactViewController].view;
   } else {
@@ -211,18 +212,34 @@ constexpr int NEW_ARCH_NUMBER_OF_ATTACH_RETRIES = 25;
     }
   }
 #else
-  UIView *touchHandlerView = nil;
+  while (touchHandlerView != nil && ![touchHandlerView isKindOfClass:[RCTSurfaceView class]]) {
+    touchHandlerView = touchHandlerView.superview;
+  }
+#endif
 
+#else
+  RNGHUIView *touchHandlerView = nil;
+
+#if !TARGET_OS_OSX
   if ([[childView reactViewController] isKindOfClass:[RCTModalHostViewController class]]) {
     touchHandlerView = [childView reactViewController].view.subviews[0];
   } else {
-    UIView *parent = childView;
+    RNGHUIView *parent = childView;
     while (parent != nil && ![parent respondsToSelector:@selector(touchHandler)]) {
       parent = parent.superview;
     }
 
     touchHandlerView = [[parent performSelector:@selector(touchHandler)] view];
   }
+#else
+  RNGHUIView *parent = childView;
+  while (parent != nil && ![parent respondsToSelector:@selector(touchHandler)]) {
+    parent = parent.superview;
+  }
+
+  touchHandlerView = [[parent performSelector:@selector(touchHandler)] view];
+#endif
+
 #endif // RCT_NEW_ARCH_ENABLED
 
   if (touchHandlerView == nil) {
@@ -246,7 +263,7 @@ constexpr int NEW_ARCH_NUMBER_OF_ATTACH_RETRIES = 25;
 }
 
 - (void)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
-    didActivateInViewWithTouchHandler:(UIView *)viewWithTouchHandler
+    didActivateInViewWithTouchHandler:(RNGHUIView *)viewWithTouchHandler
 {
   // Cancel touches in RN's root view in order to cancel all in-js recognizers
 
@@ -259,8 +276,15 @@ constexpr int NEW_ARCH_NUMBER_OF_ATTACH_RETRIES = 25;
   // particular if we have one PanHandler and ScrollView that can work simultaniously then when
   // the Pan handler activates it would still tigger cancel events.
   // Once the upstream fix lands the line below along with this comment can be removed
-  if ([gestureRecognizer.view isKindOfClass:[UIScrollView class]])
+#if TARGET_OS_OSX
+  if ([gestureRecognizer.view isKindOfClass:[NSScrollView class]]) {
     return;
+  }
+#else
+  if ([gestureRecognizer.view isKindOfClass:[UIScrollView class]]) {
+    return;
+  }
+#endif
 
   UIGestureRecognizer *touchHandler = nil;
 

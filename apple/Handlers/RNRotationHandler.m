@@ -8,7 +8,7 @@
 
 #import "RNRotationHandler.h"
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_OSX
 @interface RNBetterRotationRecognizer : UIRotationGestureRecognizer
 
 - (id)initWithGestureHandler:(RNGestureHandler *)gestureHandler;
@@ -73,14 +73,14 @@
 - (instancetype)initWithTag:(NSNumber *)tag
 {
   if ((self = [super initWithTag:tag])) {
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_OSX
     _recognizer = [[RNBetterRotationRecognizer alloc] initWithGestureHandler:self];
 #endif
   }
   return self;
 }
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_OSX
 - (RNGestureHandlerEventExtraData *)eventExtraData:(UIRotationGestureRecognizer *)recognizer
 {
   return [RNGestureHandlerEventExtraData forRotation:recognizer.rotation

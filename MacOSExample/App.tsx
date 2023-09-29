@@ -1,118 +1,104 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { Component } from 'react';
+import { Animated, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
-  SafeAreaView,
+  PanGestureHandler,
+  State,
+  PanGestureHandlerStateChangeEvent,
+  PanGestureHandlerGestureEvent,
   ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+type DraggableBoxProps = {
+  minDist?: number;
+  boxStyle?: StyleProp<ViewStyle>;
+};
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
+export class DraggableBox extends Component<DraggableBoxProps> {
+  private translateX: Animated.Value;
+  private translateY: Animated.Value;
+  private lastOffset: { x: number; y: number };
+  private onGestureEvent: (event: PanGestureHandlerGestureEvent) => void;
+  constructor(props: DraggableBoxProps) {
+    super(props);
+    this.translateX = new Animated.Value(0);
+    this.translateY = new Animated.Value(0);
+    this.lastOffset = { x: 0, y: 0 };
+    this.onGestureEvent = Animated.event(
+      [
+        {
+          nativeEvent: {
+            translationX: this.translateX,
+            translationY: this.translateY,
           },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+        },
+      ],
+      { useNativeDriver: true }
+    );
+  }
+  private onHandlerStateChange = (event: PanGestureHandlerStateChangeEvent) => {
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      this.lastOffset.x += event.nativeEvent.translationX;
+      this.lastOffset.y += event.nativeEvent.translationY;
+      this.translateX.setOffset(this.lastOffset.x);
+      this.translateX.setValue(0);
+      this.translateY.setOffset(this.lastOffset.y);
+      this.translateY.setValue(0);
+    }
+  };
+  render() {
+    return (
+      <PanGestureHandler
+        {...this.props}
+        onGestureEvent={this.onGestureEvent}
+        onHandlerStateChange={this.onHandlerStateChange}
+        minDist={this.props.minDist}>
+        <Animated.View
+          style={[
+            styles.box,
+            {
+              transform: [
+                { translateX: this.translateX },
+                { translateY: this.translateY },
+              ],
+            },
+            this.props.boxStyle,
+          ]}
+        />
+      </PanGestureHandler>
+    );
+  }
 }
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+export default class Example extends Component {
+  render() {
+    return (
+      <GestureHandlerRootView style={styles.root}>
+        <ScrollView style={styles.scrollView}>
+          <DraggableBox />
+        </ScrollView>
+      </GestureHandlerRootView>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  root: {
+    flex: 1,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  scrollView: {
+    flex: 1,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  box: {
+    width: 150,
+    height: 150,
+    alignSelf: 'center',
+    backgroundColor: 'plum',
+    margin: 10,
+    zIndex: 200,
   },
 });
 
-export default App;
+

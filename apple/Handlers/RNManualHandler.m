@@ -1,5 +1,7 @@
 #import "RNManualHandler.h"
 
+#if !TARGET_OS_OSX
+
 @interface RNManualRecognizer : UIGestureRecognizer
 
 - (id)initWithGestureHandler:(RNGestureHandler *)gestureHandler;
@@ -75,12 +77,16 @@
 
 @end
 
+#endif
+
 @implementation RNManualGestureHandler
 
 - (instancetype)initWithTag:(NSNumber *)tag
 {
   if ((self = [super initWithTag:tag])) {
+#if !TARGET_OS_OSX
     _recognizer = [[RNManualRecognizer alloc] initWithGestureHandler:self];
+#endif
   }
   return self;
 }

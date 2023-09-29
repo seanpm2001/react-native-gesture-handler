@@ -1,133 +1,50 @@
+import { NativeModules } from 'react-native';
 import { ActionType } from './ActionType';
-import { isNewWebImplementationEnabled } from './EnableNewWebImplementation';
+import { tagMessage } from './utils';
+const { RNGestureHandlerModule } = NativeModules;
 
-//GestureHandlers
-import InteractionManager from './web/tools/InteractionManager';
-import NodeManager from './web/tools/NodeManager';
-import PanGestureHandler from './web/handlers/PanGestureHandler';
-import TapGestureHandler from './web/handlers/TapGestureHandler';
-import LongPressGestureHandler from './web/handlers/LongPressGestureHandler';
-import PinchGestureHandler from './web/handlers/PinchGestureHandler';
-import RotationGestureHandler from './web/handlers/RotationGestureHandler';
-import FlingGestureHandler from './web/handlers/FlingGestureHandler';
-import NativeViewGestureHandler from './web/handlers/NativeViewGestureHandler';
-import ManualGestureHandler from './web/handlers/ManualGestureHandler';
+if (RNGestureHandlerModule == null) {
+  console.error(
+    tagMessage(
+      `react-native-gesture-handler module was not found. Make sure you're running your app on the native platform and your code is linked properly (cd ios && pod install && cd ..).
 
-//Hammer Handlers
-import * as HammerNodeManager from './web_hammer/NodeManager';
-import HammerNativeViewGestureHandler from './web_hammer/NativeViewGestureHandler';
-import HammerPanGestureHandler from './web_hammer/PanGestureHandler';
-import HammerTapGestureHandler from './web_hammer/TapGestureHandler';
-import HammerLongPressGestureHandler from './web_hammer/LongPressGestureHandler';
-import HammerPinchGestureHandler from './web_hammer/PinchGestureHandler';
-import HammerRotationGestureHandler from './web_hammer/RotationGestureHandler';
-import HammerFlingGestureHandler from './web_hammer/FlingGestureHandler';
-import { Config } from './web/interfaces';
-import { GestureHandlerWebDelegate } from './web/tools/GestureHandlerWebDelegate';
+      For installation instructions, please refer to https://docs.swmansion.com/react-native-gesture-handler/docs/#installation`
+        .split('\n')
+        .map((line) => line.trim())
+        .join('\n')
+    )
+  );
+}
 
-export const Gestures = {
-  NativeViewGestureHandler,
-  PanGestureHandler,
-  TapGestureHandler,
-  LongPressGestureHandler,
-  PinchGestureHandler,
-  RotationGestureHandler,
-  FlingGestureHandler,
-  ManualGestureHandler,
-};
+if (
+  RNGestureHandlerModule &&
+  RNGestureHandlerModule.flushOperations === undefined
+) {
+  RNGestureHandlerModule.flushOperations = () => {
+    // NO-OP if not defined
+  };
+}
 
-export const HammerGestures = {
-  NativeViewGestureHandler: HammerNativeViewGestureHandler,
-  PanGestureHandler: HammerPanGestureHandler,
-  TapGestureHandler: HammerTapGestureHandler,
-  LongPressGestureHandler: HammerLongPressGestureHandler,
-  PinchGestureHandler: HammerPinchGestureHandler,
-  RotationGestureHandler: HammerRotationGestureHandler,
-  FlingGestureHandler: HammerFlingGestureHandler,
-};
-
-export default {
-  handleSetJSResponder(_tag: number, _blockNativeResponder: boolean) {
-    // NO-OP
-  },
-  handleClearJSResponder() {
-    // NO-OP
-  },
-  createGestureHandler<T>(
-    handlerName: keyof typeof Gestures,
+export type RNGestureHandlerModuleProps = {
+  handleSetJSResponder: (tag: number, blockNativeResponder: boolean) => void;
+  handleClearJSResponder: () => void;
+  createGestureHandler: (
+    handlerName: string,
     handlerTag: number,
-    config: T
-  ) {
-    if (isNewWebImplementationEnabled()) {
-      if (!(handlerName in Gestures)) {
-        throw new Error(
-          `react-native-gesture-handler: ${handlerName} is not supported on web.`
-        );
-      }
-
-      const GestureClass = Gestures[handlerName];
-      NodeManager.createGestureHandler(
-        handlerTag,
-        new GestureClass(new GestureHandlerWebDelegate())
-      );
-      InteractionManager.getInstance().configureInteractions(
-        NodeManager.getHandler(handlerTag),
-        config as unknown as Config
-      );
-    } else {
-      if (!(handlerName in HammerGestures)) {
-        throw new Error(
-          `react-native-gesture-handler: ${handlerName} is not supported on web.`
-        );
-      }
-
-      // @ts-ignore If it doesn't exist, the error is thrown
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const GestureClass = HammerGestures[handlerName];
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      HammerNodeManager.createGestureHandler(handlerTag, new GestureClass());
-    }
-
-    this.updateGestureHandler(handlerTag, config as unknown as Config);
-  },
-  attachGestureHandler(
+    config: Readonly<Record<string, unknown>>
+  ) => void;
+  attachGestureHandler: (
     handlerTag: number,
     newView: number,
-    _actionType: ActionType,
-    propsRef: React.RefObject<unknown>
-  ) {
-    if (isNewWebImplementationEnabled()) {
-      NodeManager.getHandler(handlerTag).init(newView, propsRef);
-    } else {
-      HammerNodeManager.getHandler(handlerTag).setView(newView, propsRef);
-    }
-  },
-  updateGestureHandler(handlerTag: number, newConfig: Config) {
-    if (isNewWebImplementationEnabled()) {
-      NodeManager.getHandler(handlerTag).updateGestureConfig(newConfig);
-
-      InteractionManager.getInstance().configureInteractions(
-        NodeManager.getHandler(handlerTag),
-        newConfig
-      );
-    } else {
-      HammerNodeManager.getHandler(handlerTag).updateGestureConfig(newConfig);
-    }
-  },
-  getGestureHandlerNode(handlerTag: number) {
-    if (isNewWebImplementationEnabled()) {
-      return NodeManager.getHandler(handlerTag);
-    } else {
-      return HammerNodeManager.getHandler(handlerTag);
-    }
-  },
-  dropGestureHandler(handlerTag: number) {
-    if (isNewWebImplementationEnabled()) {
-      NodeManager.dropGestureHandler(handlerTag);
-    } else {
-      HammerNodeManager.dropGestureHandler(handlerTag);
-    }
-  },
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  flushOperations() {},
+    actionType: ActionType
+  ) => void;
+  updateGestureHandler: (
+    handlerTag: number,
+    newConfig: Readonly<Record<string, unknown>>
+  ) => void;
+  dropGestureHandler: (handlerTag: number) => void;
+  install: () => void;
+  flushOperations: () => void;
 };
+
+export default RNGestureHandlerModule as RNGestureHandlerModuleProps;
