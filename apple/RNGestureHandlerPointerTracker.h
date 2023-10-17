@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
-
+#import "RNGesturePlatform.h"
 #import "RNGHTouchEventType.h"
-#import "RNGHUiKit.h"
 
 #define MAX_POINTERS_COUNT 12
 
@@ -16,10 +15,10 @@
 
 - (id)initWithGestureHandler:(RNGestureHandler *)gestureHandler;
 
-- (void)touchesBegan:(NSSet<RNGHUITouch *> *)touches withEvent:(UIEvent *)event;
-- (void)touchesMoved:(NSSet<RNGHUITouch *> *)touches withEvent:(UIEvent *)event;
-- (void)touchesEnded:(NSSet<RNGHUITouch *> *)touches withEvent:(UIEvent *)event;
-- (void)touchesCancelled:(NSSet<RNGHUITouch *> *)touches withEvent:(UIEvent *)event;
+- (void)touchesBegan:(NSSet<UIEvent *> *)touches withEvent:(UIEvent *)event;
+- (void)touchesMoved:(NSSet<UIEvent *> *)touches withEvent:(UIEvent *)event;
+- (void)touchesEnded:(NSSet<UIEvent *> *)touches withEvent:(UIEvent *)event;
+- (void)touchesCancelled:(NSSet<UIEvent *> *)touches withEvent:(UIEvent *)event;
 - (void)reset;
 - (void)cancelPointers;
 

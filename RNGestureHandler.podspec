@@ -38,7 +38,7 @@ Pod::Spec.new do |s|
       'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/boost" "$(PODS_ROOT)/boost-for-react-native" "$(PODS_ROOT)/RCT-Folly"',
       'CLANG_CXX_LANGUAGE_STANDARD' => 'c++17',
     }
-    s.platforms       = { ios: '11.0', tvos: '11.0', osx: '10.14' }
+    s.platforms       = { ios: '11.0', tvos: '11.0', :osx => "10.15" }
     s.compiler_flags  = folly_compiler_flags + ' -DRCT_NEW_ARCH_ENABLED'
 
     s.dependency "React"
@@ -49,7 +49,7 @@ Pod::Spec.new do |s|
     s.dependency "RCTTypeSafety"
     s.dependency "ReactCommon/turbomodule/core"
   else
-    s.platforms = { :ios => "9.0", :tvos => "9.0", :osx => "10.14" }
+    s.platforms = { :ios => "9.0", :tvos => "9.0", :osx => "10.15" }
 
     s.dependency "React-Core"
   end

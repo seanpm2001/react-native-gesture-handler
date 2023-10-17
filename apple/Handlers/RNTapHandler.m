@@ -10,7 +10,6 @@
 
 #if !TARGET_OS_OSX
 #import <UIKit/UIGestureRecognizerSubclass.h>
-#endif
 
 #import <React/RCTConvert.h>
 
@@ -19,7 +18,6 @@
 // maxDelta to be configured. Using our custom implementation of tap recognizer we are able
 // to support these.
 
-#if !TARGET_OS_OSX
 @interface RNBetterTapGestureRecognizer : UIGestureRecognizer
 
 @property (nonatomic) NSUInteger numberOfTaps;
@@ -188,7 +186,6 @@ static const NSTimeInterval defaultMaxDuration = 0.5;
 }
 
 @end
-
 #endif
 
 @implementation RNTapGestureHandler {
@@ -204,6 +201,7 @@ static const NSTimeInterval defaultMaxDuration = 0.5;
   }
   return self;
 }
+
 #if !TARGET_OS_OSX
 - (void)resetConfig
 {
@@ -268,7 +266,6 @@ static const NSTimeInterval defaultMaxDuration = 0.5;
 
   return shouldBegin;
 }
-
 #endif
 
 @end

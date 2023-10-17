@@ -1,15 +1,21 @@
-import React, { Component } from 'react';
-import { Animated, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import React, {Component} from 'react';
+import {
+  Animated,
+  StyleProp,
+  StyleSheet,
+  ViewStyle,
+  ScrollView,
+} from 'react-native';
 
 import {
   PanGestureHandler,
   State,
   PanGestureHandlerStateChangeEvent,
   PanGestureHandlerGestureEvent,
-  ScrollView,
-  GestureHandlerRootView,
 } from 'react-native-gesture-handler';
 
+import {USE_NATIVE_DRIVER} from '../../config';
+import {LoremIpsum} from '../../common';
 
 type DraggableBoxProps = {
   minDist?: number;
@@ -19,13 +25,13 @@ type DraggableBoxProps = {
 export class DraggableBox extends Component<DraggableBoxProps> {
   private translateX: Animated.Value;
   private translateY: Animated.Value;
-  private lastOffset: { x: number; y: number };
+  private lastOffset: {x: number; y: number};
   private onGestureEvent: (event: PanGestureHandlerGestureEvent) => void;
   constructor(props: DraggableBoxProps) {
     super(props);
     this.translateX = new Animated.Value(0);
     this.translateY = new Animated.Value(0);
-    this.lastOffset = { x: 0, y: 0 };
+    this.lastOffset = {x: 0, y: 0};
     this.onGestureEvent = Animated.event(
       [
         {
@@ -35,7 +41,7 @@ export class DraggableBox extends Component<DraggableBoxProps> {
           },
         },
       ],
-      { useNativeDriver: true }
+      {useNativeDriver: false},
     );
   }
   private onHandlerStateChange = (event: PanGestureHandlerStateChangeEvent) => {
@@ -54,14 +60,15 @@ export class DraggableBox extends Component<DraggableBoxProps> {
         {...this.props}
         onGestureEvent={this.onGestureEvent}
         onHandlerStateChange={this.onHandlerStateChange}
-        minDist={this.props.minDist}>
+        minDist={this.props.minDist}
+      >
         <Animated.View
           style={[
             styles.box,
             {
               transform: [
-                { translateX: this.translateX },
-                { translateY: this.translateY },
+                {translateX: this.translateX},
+                {translateY: this.translateY},
               ],
             },
             this.props.boxStyle,
@@ -75,19 +82,16 @@ export class DraggableBox extends Component<DraggableBoxProps> {
 export default class Example extends Component {
   render() {
     return (
-      <GestureHandlerRootView style={styles.root}>
-        <ScrollView style={styles.scrollView}>
-          <DraggableBox />
-        </ScrollView>
-      </GestureHandlerRootView>
+      <ScrollView style={styles.scrollView}>
+        <LoremIpsum words={40} />
+        <DraggableBox />
+        <LoremIpsum />
+      </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
   scrollView: {
     flex: 1,
   },
@@ -100,5 +104,3 @@ const styles = StyleSheet.create({
     zIndex: 200,
   },
 });
-
-

@@ -13,7 +13,7 @@
 - (nullable RNGestureHandler *)handlerWithTag:(nonnull NSNumber *)handlerTag;
 - (void)registerGestureHandler:(nonnull RNGestureHandler *)gestureHandler;
 - (void)attachHandlerWithTag:(nonnull NSNumber *)handlerTag
-                      toView:(nonnull RNGHUIView *)view
+                      toView:(nonnull RCTPlatformView *)view
               withActionType:(RNGestureHandlerActionType)actionType;
 - (void)dropHandlerWithTag:(nonnull NSNumber *)handlerTag;
 - (void)dropAllHandlers;

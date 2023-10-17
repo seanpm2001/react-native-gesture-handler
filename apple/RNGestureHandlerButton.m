@@ -11,6 +11,7 @@
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #endif
+
 /**
  * Gesture Handler Button components overrides standard mechanism used by RN
  * to determine touch target, which normally would reurn the UIView that is placed
@@ -47,20 +48,17 @@
   return self;
 }
 
-- (BOOL)shouldHandleTouch:(RNGHUIView *)view
+#if !TARGET_OS_OSX
+- (BOOL)shouldHandleTouch:(RCTPlatformView *)view
 {
   if ([view isKindOfClass:[RNGestureHandlerButton class]]) {
     RNGestureHandlerButton *button = (RNGestureHandlerButton *)view;
     return button.userEnabled;
   }
-#if !TARGET_OS_OSX
+
   return [view isKindOfClass:[UIControl class]] || [view.gestureRecognizers count] > 0;
-#else
-  return [view isKindOfClass:[NSControl class]] || [view.gestureRecognizers count] > 0;
-#endif
 }
 
-#if !TARGET_OS_OSX
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
   if (UIEdgeInsetsEqualToEdgeInsets(self.hitTestEdgeInsets, UIEdgeInsetsZero)) {
@@ -69,19 +67,43 @@
   CGRect hitFrame = UIEdgeInsetsInsetRect(self.bounds, self.hitTestEdgeInsets);
   return CGRectContainsPoint(hitFrame, point);
 }
-#endif
 
-- (RNGHUIView *)hitTest:(CGPoint)point withEvent:(RNGHUITouch *)event
+- (RCTPlatformView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 {
-#if !TARGET_OS_OSX
-  RNGHUIView *inner = [super hitTest:point withEvent:event];
-#else
-  RNGHUIView *inner = [super hitTest:point];
-#endif
+  RCTPlatformView *inner = [super hitTest:point withEvent:event];
   while (inner && ![self shouldHandleTouch:inner]) {
     inner = inner.superview;
   }
   return inner;
 }
+#else
+- (BOOL)shouldHandleTouch:(RCTPlatformView *)view
+{
+  if ([view isKindOfClass:[RNGestureHandlerButton class]]) {
+    RNGestureHandlerButton *button = (RNGestureHandlerButton *)view;
+    return button.userEnabled;
+  }
+
+  return [view isKindOfClass:[NSControl class]] || [view.gestureRecognizers count] > 0;
+}
+
+- (BOOL)pointInside:(NSPoint)point withEvent:(UIEvent *)event
+{
+  if (UIEdgeInsetsEqualToEdgeInsets(self.hitTestEdgeInsets, UIEdgeInsetsZero)) {
+    return [super hitTest:point];
+  }
+  CGRect hitFrame = UIEdgeInsetsInsetRect(self.bounds, self.hitTestEdgeInsets);
+  return CGRectContainsPoint(hitFrame, point);
+}
+
+- (RCTPlatformView *)hitTest:(NSPoint)point withEvent:(UIEvent *)event
+{
+  RCTPlatformView *inner = [super hitTest:point];
+  while (inner && ![self shouldHandleTouch:inner]) {
+    inner = inner.superview;
+  }
+  return inner;
+}
+#endif
 
 @end

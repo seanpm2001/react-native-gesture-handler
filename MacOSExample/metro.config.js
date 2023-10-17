@@ -1,13 +1,12 @@
-const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
-
 const path = require('path');
 const exclusionList = require('metro-config/src/defaults/exclusionList');
 const escape = require('escape-string-regexp');
 const pack = require('../package.json');
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
 const root = path.resolve(__dirname, '..');
 
-const modules = [...Object.keys(pack.peerDependencies), 'react-native-macos'];
+const modules = Object.keys(pack.peerDependencies);
 
 /**
  * Metro configuration
@@ -32,6 +31,15 @@ const config = {
       acc[name] = path.join(__dirname, 'node_modules', name);
       return acc;
     }, {}),
+  },
+
+  transformer: {
+    getTransformOptions: async () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
+      },
+    }),
   },
 };
 

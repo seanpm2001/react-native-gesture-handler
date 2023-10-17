@@ -11,7 +11,7 @@
     "ts-check": "yarn tsc --noEmit",
     "format:js": "prettier --write --list-different './{src,example,FabricExample}/**/*.{js,jsx,ts,tsx}'",
     "format:android": "node ./scripts/format-android.js",
-    "format:ios": "find apple/ -iname *.h -o -iname *.m -o -iname *.cpp -o -iname *.mm | xargs clang-format -i",
+    "format:ios": "find ios/ -iname *.h -o -iname *.m -o -iname *.cpp -o -iname *.mm | xargs clang-format -i",
     "lint:js": "eslint --ext '.js,.ts,.tsx' src/ example/src FabricExample/src && yarn prettier --check './{src,example,FabricExample}/**/*.{js,jsx,ts,tsx}'",
     "lint:js-root": "eslint --ext '.js,.ts,.tsx' src/ && yarn prettier --check './src/**/*.{js,jsx,ts,tsx}'",
     "lint:android": "./android/gradlew -p android spotlessCheck -q"
@@ -36,7 +36,7 @@
     "android/common/src/main/java/",
     "android/reanimated/src/main/java/",
     "android/noreanimated/src/main/java/",
-    "apple/",
+    "ios/",
     "Swipeable/",
     "jest-utils/",
     "DrawerLayout/",
@@ -116,12 +116,12 @@
   "lint-staged": {
     "./{src,example,FabricExample}/**/*.{ts,tsx}": "yarn format:js",
     "android/**/*.kt": "yarn format:android",
-    "apple/**/*.{h,m,mm,cpp}": "yarn format:ios"
+    "ios/**/*.{h,m,mm,cpp}": "yarn format:ios"
   },
   "release-it": {
     "hooks": {
       "before:git:bump": [
-        "# check if version corresponds to changes in native files  \n if git diff --name-only ${latestVersion} HEAD | egrep \"(android/.*)|(apple/.*)\" -q; then egrep '\\.0$' -q <<< ${version}; else test $? -eq 1; fi"
+        "# check if version corresponds to changes in native files  \n if git diff --name-only ${latestVersion} HEAD | egrep \"(android/.*)|(ios/.*)\" -q; then egrep '\\.0$' -q <<< ${version}; else test $? -eq 1; fi"
       ]
     }
   },

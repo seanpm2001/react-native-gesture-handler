@@ -23,6 +23,7 @@
 
 #pragma mark RNDummyGestureRecognizer
 
+
 @implementation RNDummyGestureRecognizer {
   __weak RNGestureHandler *_gestureHandler;
 }
@@ -39,24 +40,24 @@
 
 #if !TARGET_OS_OSX
 
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
   [_gestureHandler.pointerTracker touchesBegan:touches withEvent:event];
 }
 
-- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
   [_gestureHandler.pointerTracker touchesMoved:touches withEvent:event];
 }
 
-- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
   [_gestureHandler.pointerTracker touchesEnded:touches withEvent:event];
   self.state = UIGestureRecognizerStateFailed;
   [self reset];
 }
 
-- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
   [_gestureHandler.pointerTracker touchesCancelled:touches withEvent:event];
   self.state = UIGestureRecognizerStateCancelled;
@@ -70,7 +71,9 @@
 }
 #endif
 
+
 @end
+
 
 #pragma mark RNNativeViewgestureHandler
 

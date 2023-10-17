@@ -98,52 +98,42 @@ API_AVAILABLE(ios(13.4))
   return self;
 }
 
-- (void)bindToView:(RNGHUIView *)view
-{
 #if !TARGET_OS_OSX && defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_4) && \
     __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_4
+- (void)bindToView:(UIView *)view
+{
   if (@available(iOS 13.4, *)) {
     [super bindToView:view];
     [view addInteraction:_pointerInteraction];
   }
-#endif
 }
 
 - (void)unbindFromView
 {
-#if !TARGET_OS_OSX && defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_4) && \
-    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_4
   if (@available(iOS 13.4, *)) {
     [super unbindFromView];
     [self.recognizer.view removeInteraction:_pointerInteraction];
   }
-#endif
 }
 
 - (void)resetConfig
 {
   [super resetConfig];
 
-#if !TARGET_OS_OSX && defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_4) && \
-    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_4
   if (@available(iOS 13.4, *)) {
     RNBetterHoverGestureRecognizer *recognizer = (RNBetterHoverGestureRecognizer *)_recognizer;
     recognizer.hoverEffect = RNGestureHandlerHoverEffectNone;
   }
-#endif
 }
 
 - (void)configure:(NSDictionary *)config
 {
   [super configure:config];
 
-#if !TARGET_OS_OSX && defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_4) && \
-    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_4
   if (@available(iOS 13.4, *)) {
     RNBetterHoverGestureRecognizer *recognizer = (RNBetterHoverGestureRecognizer *)_recognizer;
     APPLY_INT_PROP(hoverEffect);
   }
-#endif
 }
 
 - (RNGestureHandlerEventExtraData *)eventExtraData:(UIGestureRecognizer *)recognizer
@@ -151,5 +141,6 @@ API_AVAILABLE(ios(13.4))
   return [RNGestureHandlerEventExtraData forPosition:[recognizer locationInView:recognizer.view]
                                 withAbsolutePosition:[recognizer locationInView:recognizer.view.window]];
 }
+#endif
 
 @end
