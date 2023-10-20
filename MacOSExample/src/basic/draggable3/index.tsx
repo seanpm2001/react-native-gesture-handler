@@ -7,7 +7,6 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {LoremIpsum} from '../../common';
 
 type DraggableBoxProps = {
   minDist?: number;
@@ -18,25 +17,26 @@ export const DraggableBox: FC<DraggableBoxProps> = props => {
   const translateY = useSharedValue(0);
   const translateX = useSharedValue(0);
 
-  const style = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {translateY: translateY.value},
-        {translateX: translateX.value},
-      ],
-    };
-  }, []);
+  let x = useSharedValue(0);
+  let y = useSharedValue(0);
 
   const panGesture = Gesture.Pan()
     .minDistance(props.minDist || 0)
     .onUpdate(e => {
-      translateX.value = e.translationX;
-      translateY.value = e.translationY;
+      translateX.value = x.value + e.translationX;
+      translateY.value = y.value + e.translationY;
+    }).onEnd( e => {
+      x.value = translateX.value;
+      y.value = translateY.value;
     });
 
   return (
     <GestureDetector gesture={panGesture}>
-      <Animated.View style={[styles.box, style, props.boxStyle]} />
+      <Animated.View style={[styles.box, props.boxStyle,
+      {
+        top: translateY,
+        left: translateX,
+      }]} />
     </GestureDetector>
   );
 };
@@ -44,9 +44,7 @@ export const DraggableBox: FC<DraggableBoxProps> = props => {
 export default function Example() {
   return (
     <ScrollView style={styles.scrollView}>
-      <LoremIpsum words={40} />
       <DraggableBox />
-      <LoremIpsum />
     </ScrollView>
   );
 }
@@ -58,9 +56,8 @@ const styles = StyleSheet.create({
   box: {
     width: 150,
     height: 150,
-    alignSelf: 'center',
+    position: 'absolute',
     backgroundColor: 'plum',
     margin: 10,
-    zIndex: 200,
   },
 });
