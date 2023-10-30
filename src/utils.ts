@@ -1,4 +1,6 @@
-import pack from 'react-native/package.json';
+import { Platform } from 'react-native';
+
+const pack = Platform.OS === 'web' ? {} : require('react-native/package.json');
 
 const [majorStr, minorStr] = pack.version.split('.');
 export const REACT_NATIVE_VERSION = {
